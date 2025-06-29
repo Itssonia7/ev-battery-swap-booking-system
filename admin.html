@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard | EV Battery Swap</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style_v2.css') }}">
+  <style>
+    .admin-container {
+      max-width: 1000px;
+      margin: 60px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    th {
+      background-color: #8ec5fc;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #4a4a4a;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+
+    <h2>👥 Registered Users</h2>
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+      </tr>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <h2>📅 All Bookings</h2>
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>Station</th>
+        <th>Date</th>
+        <th>Time</th>
+      </tr>
+      {% for booking in bookings %}
+      <tr>
+        <td>{{ booking.id }}</td>
+        <td>{{ booking.user.username }}</td>
+        <td>{{ booking.station }}</td>
+        <td>{{ booking.date }}</td>
+        <td>{{ booking.time }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+</body>
+</html>

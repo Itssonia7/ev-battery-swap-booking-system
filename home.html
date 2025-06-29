@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Home | Battery Swap</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style_v2.css') }}">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #e0c3fc, #8ec5fc);
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: bold;
+      color: white;
+      letter-spacing: 2px;
+    }
+
+    nav {
+      margin-top: 10px;
+    }
+
+    nav a {
+      margin: 0 12px;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+
+    nav a:hover {
+      background-color: #ffffff44;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #8ec5fc;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #6fb3f2;
+    }
+
+    .flash {
+      padding: 12px;
+      margin: 15px auto;
+      border-radius: 6px;
+      font-weight: bold;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    .flash.success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .flash.error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .booking-table {
+      display: none;
+      margin-top: 25px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #f1f1f1;
+    }
+
+    .toggle-link {
+      display: inline-block;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #3b82f6;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">EV BATTERY SWAP</div>
+    {% if current_user.is_authenticated %}
+    <nav>
+      <a href="{{ url_for('home') }}">Home</a>
+      <a href="#" onclick="toggleBookings()">My Bookings</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+    {% endif %}
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="container">
+    {% if not current_user.is_authenticated %}
+      <h2>Welcome to EV Battery Swap</h2>
+      <p>Please <a href="{{ url_for('login') }}">login</a> or <a href="{{ url_for('signup') }}">sign up</a> to book your appointment.</p>
+      <p><a href="{{ url_for('admin_login') }}">→ Admin Login</a></p>
+    {% else %}
+      <h2>Welcome back, {{ current_user.username }}!</h2>
+      <form method="POST" action="{{ url_for('book') }}">
+        <label>Station:</label>
+        <select name="station" required>
+          <option value="Station A">Station A</option>
+          <option value="Station B">Station B</option>
+          <option value="Station C">Station C</option>
+        </select>
+
+        <label>Date:</label>
+        <input type="date" name="date" required>
+
+        <label>Time:</label>
+        <input type="time" name="time" required>
+
+        <button type="submit">Book Appointment</button>
+      </form>
+
+      <div class="toggle-link" onclick="toggleBookings()">Show My Bookings</div>
+
+      <div id="bookingTable" class="booking-table">
+        {% if current_user.bookings %}
+          <table>
+            <tr>
+              <th>Station</th>
+              <th>Date</th>
+              <th>Time</th>
+            </tr>
+            {% for booking in current_user.bookings %}
+              <tr>
+                <td>{{ booking.station }}</td>
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.time }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+        {% else %}
+          <p>No bookings yet.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    function toggleBookings() {
+      const table = document.getElementById('bookingTable');
+      if (table.style.display === 'none' || table.style.display === '') {
+        table.style.display = 'block';
+        event.target.innerText = 'Hide My Bookings';
+      } else {
+        table.style.display = 'none';
+        event.target.innerText = 'Show My Bookings';
+      }
+    }
+  </script>
+
+</body>
+</html>
